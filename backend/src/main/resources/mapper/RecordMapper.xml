@@ -18,8 +18,8 @@
 
     <select id="selectRecordGroupList" resultType="com.mayi.book.dto.RecordGroupDTO">
         SELECT
-            DATE(r.record_date) as date,
-            CASE DAYOFWEEK(r.record_date)
+            t.date as date,
+            CASE t.dayOfWeek
                 WHEN 1 THEN '星期日'
                 WHEN 2 THEN '星期一'
                 WHEN 3 THEN '星期二'
@@ -28,19 +28,26 @@
                 WHEN 6 THEN '星期五'
                 WHEN 7 THEN '星期六'
             END as dayOfWeek,
-            COALESCE(SUM(CASE WHEN r.type = 'expense' THEN r.amount ELSE 0 END), 0) as totalExpense,
-            COALESCE(SUM(CASE WHEN r.type = 'income' THEN r.amount ELSE 0 END), 0) as totalIncome
-        FROM record r
-        WHERE r.user_id = #{userId}
-          AND r.del_flag = 0
-        <if test="month != null and month != ''">
-          AND DATE_FORMAT(r.record_date, '%Y-%m') = #{month}
-        </if>
-        <if test="type != null and type != ''">
-          AND r.type = #{type}
-        </if>
-        GROUP BY DATE(r.record_date)
-        ORDER BY r.record_date DESC
+            COALESCE(SUM(CASE WHEN t.type = 'expense' THEN t.amount ELSE 0 END), 0) as totalExpense,
+            COALESCE(SUM(CASE WHEN t.type = 'income' THEN t.amount ELSE 0 END), 0) as totalIncome
+        FROM (
+            SELECT
+                DATE(r.record_date) as date,
+                DAYOFWEEK(DATE(r.record_date)) as dayOfWeek,
+                r.type,
+                r.amount
+            FROM record r
+            WHERE r.user_id = #{userId}
+              AND r.del_flag = 0
+            <if test="month != null and month != ''">
+              AND DATE_FORMAT(r.record_date, '%Y-%m') = #{month}
+            </if>
+            <if test="type != null and type != ''">
+              AND r.type = #{type}
+            </if>
+        ) t
+        GROUP BY t.date, t.dayOfWeek
+        ORDER BY t.date DESC
         LIMIT #{offset}, #{pageSize}
     </select>
 

@@ -1,4 +1,6 @@
-const BASE_URL = 'http://localhost:9091/api'
+import config from '../config/index.js'
+
+const BASE_URL = config.baseUrl
 
 // 请求拦截器
 const request = (options) => {
