@@ -4,27 +4,23 @@
     <view class="yellow-header">
       <!-- 顶部栏 -->
       <view class="header-top">
-        <view class="header-left">
-          <text class="smile-icon">😊</text>
-          <view class="date-selector-top" @click="showMonthPicker">
-            <text class="year-top">{{ formatYear(currentMonth) }}</text>
-            <view class="month-row-top">
-              <text class="month-top">{{ formatMonth(currentMonth) }}</text>
-              <text class="arrow-top">▼</text>
-            </view>
-          </view>
-        </view>
         <view class="header-center">
           <text class="app-name">蚂蚁记账</text>
         </view>
-        <view class="header-right">
-          <text class="icon">🔍</text>
-          <text class="icon">📅</text>
-        </view>
+        
       </view>
       
       <!-- 统计区域 -->
       <view class="statistics-section">
+		  <view class="header-left">
+		    <view class="date-selector-top" @click="showMonthPicker">
+		      <text class="year-top">{{ formatYear(currentMonth) }}</text>
+		      <view class="month-row-top">
+		        <text class="month-top">{{ formatMonth(currentMonth) }}</text>
+		        <text class="arrow-top">▼</text>
+		      </view>
+		    </view>
+		  </view>
         <!-- 收入区域 -->
         <view class="income-section">
           <text class="label">收入</text>
@@ -36,7 +32,6 @@
           <text class="label">支出</text>
           <view class="expense-row">
             <text class="amount">{{ formatAmount(statistics.totalExpense) }}</text>
-            <text class="eye-icon">👁️</text>
           </view>
         </view>
       </view>
@@ -111,6 +106,40 @@
         <text>没有更多了</text>
       </view>
     </scroll-view>
+    
+    <!-- 月份选择器弹层 -->
+    <view v-if="showPicker" class="picker-mask" @click="hideMonthPicker">
+      <view class="picker-container" @click.stop>
+        <!-- 顶部操作栏 -->
+        <view class="picker-header">
+          <text class="picker-btn cancel-btn" @click="hideMonthPicker">取消</text>
+          <text class="picker-title">选择月份</text>
+          <text class="picker-btn confirm-btn" @click="confirmMonthPicker">确定</text>
+        </view>
+        
+        <!-- 滚轮选择器 -->
+        <picker-view 
+          class="picker-view" 
+          :value="pickerValue" 
+          @change="onPickerChange"
+          indicator-style="height: 80rpx;"
+        >
+          <!-- 年份列 -->
+          <picker-view-column>
+            <view v-for="(year, index) in yearList" :key="index" class="picker-item">
+              <text>{{ year }}年</text>
+            </view>
+          </picker-view-column>
+          
+          <!-- 月份列 -->
+          <picker-view-column>
+            <view v-for="(month, index) in monthList" :key="index" class="picker-item">
+              <text>{{ month }}月</text>
+            </view>
+          </picker-view-column>
+        </picker-view>
+      </view>
+    </view>
   </view>
 </template>
 
@@ -127,9 +156,37 @@ export default {
   },
   
   data() {
+    // 生成年份列表（当前年份前后各3年，共7年）
+    const currentYear = new Date().getFullYear()
+    const yearList = []
+    for (let i = currentYear - 3; i <= currentYear + 3; i++) {
+      yearList.push(i)
+    }
+    
+    // 生成月份列表（01-12月）
+    const monthList = []
+    for (let i = 1; i <= 12; i++) {
+      monthList.push(String(i).padStart(2, '0'))
+    }
+    
+    // 解析当前月份，获取年份和月份的索引
+    const currentMonthStr = getCurrentMonth()
+    const [year, month] = currentMonthStr.split('-')
+    const yearInt = parseInt(year)
+    const monthInt = parseInt(month)
+    
+    // 计算年份索引（默认是中间位置，即当前年份）
+    let yearIndex = yearList.indexOf(yearInt)
+    if (yearIndex < 0) {
+      yearIndex = 3 // 默认选中当前年份（中间位置）
+    }
+    
+    // 计算月份索引（0-11）
+    const monthIndex = monthInt >= 1 && monthInt <= 12 ? monthInt - 1 : new Date().getMonth()
+    
     return {
       currentTime: '',
-      currentMonth: getCurrentMonth(),
+      currentMonth: currentMonthStr,
       statistics: {
         totalExpense: 0,
         totalIncome: 0,
@@ -141,7 +198,13 @@ export default {
       loading: false,
       noMore: false,
       refreshing: false,
-      isFirstLoad: true // 标记是否首次加载
+      isFirstLoad: true, // 标记是否首次加载
+      showPicker: false, // 是否显示选择器
+      yearList, // 年份列表
+      monthList, // 月份列表
+      pickerValue: [yearIndex, monthIndex], // 选择器的值 [年份索引, 月份索引]
+      selectedYear: yearInt, // 选中的年份
+      selectedMonth: month // 选中的月份
     }
   },
   
@@ -285,23 +348,42 @@ export default {
     },
     
     showMonthPicker() {
-      // 简单的月份选择，实际可以使用picker组件
-      uni.showActionSheet({
-        itemList: ['本月', '上月', '选择月份'],
-        success: (res) => {
-          if (res.tapIndex === 0) {
-            this.currentMonth = getCurrentMonth()
-            this.refreshData()
-          } else if (res.tapIndex === 1) {
-            const now = new Date()
-            now.setMonth(now.getMonth() - 1)
-            const year = now.getFullYear()
-            const month = String(now.getMonth() + 1).padStart(2, '0')
-            this.currentMonth = `${year}-${month}`
-            this.refreshData()
-          }
-        }
-      })
+      // 显示选择器前，初始化选择器的值为当前月份
+      const [year, month] = this.currentMonth.split('-')
+      const yearInt = parseInt(year)
+      const monthInt = parseInt(month)
+      
+      // 计算年份索引
+      let yearIndex = this.yearList.indexOf(yearInt)
+      if (yearIndex < 0) {
+        yearIndex = 3 // 默认选中当前年份（中间位置）
+      }
+      
+      // 计算月份索引（0-11）
+      const monthIndex = monthInt >= 1 && monthInt <= 12 ? monthInt - 1 : new Date().getMonth()
+      
+      this.pickerValue = [yearIndex, monthIndex]
+      this.selectedYear = yearInt
+      this.selectedMonth = String(monthInt).padStart(2, '0')
+      this.showPicker = true
+    },
+    
+    hideMonthPicker() {
+      this.showPicker = false
+    },
+    
+    onPickerChange(e) {
+      const [yearIndex, monthIndex] = e.detail.value
+      this.pickerValue = [yearIndex, monthIndex]
+      this.selectedYear = this.yearList[yearIndex]
+      this.selectedMonth = this.monthList[monthIndex]
+    },
+    
+    confirmMonthPicker() {
+      // 确认选择，更新当前月份并刷新数据
+      this.currentMonth = `${this.selectedYear}-${this.selectedMonth}`
+      this.hideMonthPicker()
+      this.refreshData()
     },
     
     getRecordType(record) {
@@ -337,7 +419,7 @@ export default {
 .header-top {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   padding: 0 30rpx 20rpx;
 }
 
@@ -543,5 +625,69 @@ export default {
 .empty-tip {
   font-size: 24rpx;
   color: #ccc;
+}
+
+/* 月份选择器弹层 */
+.picker-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  display: flex;
+  align-items: flex-end;
+}
+
+.picker-container {
+  width: 100%;
+  background-color: #fff;
+  border-top-left-radius: 30rpx;
+  border-top-right-radius: 30rpx;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.picker-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 30rpx 40rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.picker-btn {
+  font-size: 32rpx;
+  color: #333;
+  padding: 10rpx 20rpx;
+}
+
+.cancel-btn {
+  color: #999;
+}
+
+.confirm-btn {
+  color: #667eea;
+  font-weight: 500;
+}
+
+.picker-title {
+  font-size: 32rpx;
+  color: #333;
+  font-weight: 500;
+}
+
+.picker-view {
+  width: 100%;
+  height: 400rpx;
+}
+
+.picker-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 80rpx;
+  font-size: 32rpx;
+  color: #333;
 }
 </style>
