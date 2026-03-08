@@ -1,0 +1,17 @@
+{
+  "name": "mayi-book",
+  "version": "1.0.0",
+  "description": "蚂蚁记账微信小程序",
+  "main": "main.js",
+  "scripts": {
+    "dev:mp-weixin": "uni build -p mp-weixin --watch"
+  },
+  "dependencies": {
+    "@dcloudio/uni-app": "^2.0.0",
+    "@dcloudio/uni-mp-weixin": "^2.0.0"
+  },
+  "devDependencies": {},
+  "uni-app": {
+    "scripts": {}
+  }
+}

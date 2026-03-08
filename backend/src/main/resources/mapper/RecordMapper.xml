@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mayi.book.mapper.RecordMapper">
+
+    <resultMap id="RecordGroupDTOMap" type="com.mayi.book.dto.RecordGroupDTO">
+        <result column="date" property="date"/>
+        <result column="day_of_week" property="dayOfWeek"/>
+        <result column="total_expense" property="totalExpense"/>
+        <result column="total_income" property="totalIncome"/>
+        <collection property="records" ofType="com.mayi.book.dto.RecordDTO">
+            <result column="record_id" property="id"/>
+            <result column="category_name" property="categoryName"/>
+            <result column="amount" property="amount"/>
+            <result column="remark" property="remark"/>
+            <result column="create_time" property="createTime"/>
+        </collection>
+    </resultMap>
+
+    <select id="selectRecordGroupList" resultType="com.mayi.book.dto.RecordGroupDTO">
+        SELECT
+            DATE(r.record_date) as date,
+            CASE DAYOFWEEK(r.record_date)
+                WHEN 1 THEN '星期日'
+                WHEN 2 THEN '星期一'
+                WHEN 3 THEN '星期二'
+                WHEN 4 THEN '星期三'
+                WHEN 5 THEN '星期四'
+                WHEN 6 THEN '星期五'
+                WHEN 7 THEN '星期六'
+            END as dayOfWeek,
+            COALESCE(SUM(CASE WHEN r.type = 'expense' THEN r.amount ELSE 0 END), 0) as totalExpense,
+            COALESCE(SUM(CASE WHEN r.type = 'income' THEN r.amount ELSE 0 END), 0) as totalIncome
+        FROM record r
+        WHERE r.user_id = #{userId}
+          AND r.del_flag = 0
+        <if test="month != null and month != ''">
+          AND DATE_FORMAT(r.record_date, '%Y-%m') = #{month}
+        </if>
+        <if test="type != null and type != ''">
+          AND r.type = #{type}
+        </if>
+        GROUP BY DATE(r.record_date)
+        ORDER BY r.record_date DESC
+        LIMIT #{offset}, #{pageSize}
+    </select>
+
+    <select id="countRecordGroup" resultType="java.lang.Long">
+        SELECT COUNT(DISTINCT DATE(r.record_date))
+        FROM record r
+        WHERE r.user_id = #{userId}
+          AND r.del_flag = 0
+        <if test="month != null and month != ''">
+          AND DATE_FORMAT(r.record_date, '%Y-%m') = #{month}
+        </if>
+        <if test="type != null and type != ''">
+          AND r.type = #{type}
+        </if>
+    </select>
+
+    <select id="selectRecordsByDate" resultType="com.mayi.book.dto.RecordDTO">
+        SELECT
+            r.id,
+            r.type,
+            c.name as categoryName,
+            r.amount,
+            r.remark,
+            r.create_time as createTime
+        FROM record r
+        LEFT JOIN category c ON r.category_id = c.id AND c.del_flag = 0
+        WHERE r.user_id = #{userId}
+          AND DATE(r.record_date) = #{date}
+          AND r.del_flag = 0
+        <if test="type != null and type != ''">
+          AND r.type = #{type}
+        </if>
+        ORDER BY r.create_time DESC
+    </select>
+
+    <select id="selectStatistics" resultType="com.mayi.book.dto.StatisticsResponse">
+        SELECT
+            COALESCE(SUM(CASE WHEN type = 'expense' THEN amount ELSE 0 END), 0) as totalExpense,
+            COALESCE(SUM(CASE WHEN type = 'income' THEN amount ELSE 0 END), 0) as totalIncome,
+            COALESCE(SUM(CASE WHEN type = 'income' THEN amount ELSE 0 END), 0) -
+            COALESCE(SUM(CASE WHEN type = 'expense' THEN amount ELSE 0 END), 0) as balance
+        FROM record
+        WHERE user_id = #{userId}
+          AND del_flag = 0
+        <if test="month != null and month != ''">
+          AND DATE_FORMAT(record_date, '%Y-%m') = #{month}
+        </if>
+    </select>
+
+</mapper>
