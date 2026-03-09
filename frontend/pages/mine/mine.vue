@@ -33,6 +33,7 @@
 <script>
 import { mapMutations, mapState } from 'vuex'
 import { userApi } from '@/utils/api.js'
+import { HTTP_CODE_OK } from '@/utils/util.js'
 
 export default {
   computed: {
@@ -92,7 +93,7 @@ export default {
       // 从后端获取最新信息（用于同步）
       try {
         const res = await userApi.getUserInfo()
-        if (res.code === 200 && res.data) {
+        if (res.code === HTTP_CODE_OK && res.data) {
           this.localUserInfo = { ...this.localUserInfo, ...res.data }
           this.SET_USER_INFO(this.localUserInfo)
         }

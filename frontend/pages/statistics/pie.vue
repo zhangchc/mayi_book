@@ -45,7 +45,7 @@
 
 <script>
 import { recordApi } from '@/utils/api.js'
-import { formatAmount, getCategoryIconDisplay } from '@/utils/util.js'
+import { formatAmount, getCategoryIconDisplay, HTTP_CODE_OK } from '@/utils/util.js'
 
 const PIE_COLORS = ['#FFEB3B', '#5C5C5C', '#8BC34A', '#03A9F4', '#FF9800', '#9C27B0', '#00BCD4', '#E91E63']
 
@@ -89,7 +89,7 @@ export default {
       const { startDate, endDate } = this.getCurrentMonthRange()
       try {
         const res = await recordApi.getExpenseRanking({ startDate, endDate })
-        this.list = (res.code === 200 && Array.isArray(res.data)) ? res.data : []
+        this.list = (res.code === HTTP_CODE_OK && Array.isArray(res.data)) ? res.data : []
         this.$nextTick(() => { setTimeout(() => this.drawPie(), 150) })
       } catch (e) {
         this.list = []

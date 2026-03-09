@@ -40,6 +40,7 @@
 
 <script>
 import { userApi } from '@/utils/api.js'
+import { HTTP_CODE_OK } from '@/utils/util.js'
 import { mapMutations } from 'vuex'
 
 export default {
@@ -66,11 +67,9 @@ export default {
     
     // 选择头像回调（必须在用户点击事件中触发）
     onChooseAvatar(e) {
-      console.log('用户选择头像:', e)
       const { avatarUrl } = e.detail
       if (avatarUrl) {
         this.avatarUrl = avatarUrl
-        console.log('头像选择成功:', avatarUrl)
       } else {
         console.warn('未获取到头像URL')
       }
@@ -82,7 +81,6 @@ export default {
       const value = (e.detail && e.detail.value) ? e.detail.value : (this.nickName || '')
       if (value) {
         this.nickName = value.trim()
-        console.log('昵称输入:', this.nickName)
       }
     },
     
@@ -101,21 +99,11 @@ export default {
       }
       
       this.loading = true
-      console.log('开始登录流程...')
-      console.log('用户信息:', {
-        nickName: this.nickName,
-        avatarUrl: this.avatarUrl,
-        hasNickName: !!this.nickName,
-        hasAvatarUrl: !!this.avatarUrl
-      })
       
       // 步骤1: 获取微信登录code（必须在点击事件中直接调用）
-      console.log('步骤1: 获取微信登录code')
       uni.login({
         provider: 'weixin',
         success: (loginRes) => {
-          console.log('uni.login 成功:', loginRes)
-          
           if (!loginRes.code) {
             console.error('登录code为空')
             uni.showToast({
@@ -127,25 +115,13 @@ export default {
             return
           }
           
-          console.log('获取到登录code:', loginRes.code)
-          
           // 步骤2: 调用后端登录接口
-          console.log('步骤2: 调用后端登录接口')
-          console.log('请求参数:', {
-            code: loginRes.code,
-            nickName: this.nickName,
-            avatarUrl: this.avatarUrl
-          })
-          
           userApi.login({
             code: loginRes.code,
             nickName: this.nickName,
             avatarUrl: this.avatarUrl || null  // 如果头像为空，传 null
           }).then((res) => {
-            console.log('后端登录接口响应:', res)
-            
-            if (res.code === 200) {
-              console.log('登录成功，保存token和用户信息')
+            if (res.code === HTTP_CODE_OK) {
               // 保存token和用户信息
               this.SET_TOKEN(res.data.token)
               this.SET_USER_INFO({

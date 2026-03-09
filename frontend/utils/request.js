@@ -1,5 +1,6 @@
 import config from '../config/index.js'
 import store from '../store/index.js'
+import { HTTP_CODE_OK } from './util.js'
 
 const BASE_URL = config.baseUrl
 
@@ -36,8 +37,8 @@ const request = (options) => {
           data: res.data
         })
         
-        if (res.statusCode === 200) {
-          if (res.data.code === 200) {
+        if (res.statusCode === HTTP_CODE_OK) {
+          if (res.data.code === HTTP_CODE_OK) {
             resolve(res.data)
           } else if (res.data.code === 401) {
             // token 过期或未登录，清除本地存储和 Vuex，不自动跳转（由各页面决定是否跳转登录）

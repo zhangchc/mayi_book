@@ -2,20 +2,6 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.mayi.book.mapper.RecordMapper">
 
-    <resultMap id="RecordGroupDTOMap" type="com.mayi.book.dto.RecordGroupDTO">
-        <result column="date" property="date"/>
-        <result column="day_of_week" property="dayOfWeek"/>
-        <result column="total_expense" property="totalExpense"/>
-        <result column="total_income" property="totalIncome"/>
-        <collection property="records" ofType="com.mayi.book.dto.RecordDTO">
-            <result column="record_id" property="id"/>
-            <result column="category_name" property="categoryName"/>
-            <result column="amount" property="amount"/>
-            <result column="remark" property="remark"/>
-            <result column="create_time" property="createTime"/>
-        </collection>
-    </resultMap>
-
     <select id="selectRecordGroupList" resultType="com.mayi.book.dto.RecordGroupDTO">
         SELECT
             t.date as date,

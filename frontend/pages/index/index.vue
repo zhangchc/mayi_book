@@ -145,7 +145,7 @@
 
 <script>
 import { recordApi } from '@/utils/api.js'
-import { formatMonth, formatAmount, getCurrentMonth } from '@/utils/util.js'
+import { formatMonth, formatAmount, getCurrentMonth, HTTP_CODE_OK } from '@/utils/util.js'
 import DateHeader from '@/components/date-header/date-header.vue'
 import RecordItem from '@/components/record-item/record-item.vue'
 
@@ -292,7 +292,7 @@ export default {
           month: this.currentMonth
         })
         
-        if (res.code === 200) {
+        if (res.code === HTTP_CODE_OK) {
           const list = res.data.list || []
           if (this.page === 1) {
             this.recordList = list
@@ -336,7 +336,7 @@ export default {
     async loadStatistics() {
       try {
         const res = await recordApi.getStatistics(this.currentMonth)
-        if (res.code === 200) {
+        if (res.code === HTTP_CODE_OK) {
           this.statistics = res.data
         }
       } catch (error) {

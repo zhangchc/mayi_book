@@ -158,7 +158,7 @@ function getWeeksInYear(year) {
 }
 
 import { recordApi } from '@/utils/api.js'
-import { formatAmount, getCategoryIconDisplay } from '@/utils/util.js'
+import { formatAmount, getCategoryIconDisplay, HTTP_CODE_OK } from '@/utils/util.js'
 
 export default {
   data() {
@@ -374,7 +374,7 @@ export default {
       const { startDate, endDate } = this.calcWeekRange()
       try {
         const res = await recordApi.getWeeklyStatistics({ startDate, endDate, type: this.recordType })
-        if (res.code === 200 && res.data) {
+        if (res.code === HTTP_CODE_OK && res.data) {
           this.weeklySummary = { totalAmount: res.data.totalAmount || 0, averageAmount: res.data.averageAmount || 0 }
           this.weeklyPoints = this.buildWeekPoints(startDate, endDate, res.data.dailyList || [])
           this.$nextTick(() => { setTimeout(() => this.drawWeekChart(), 100) })
@@ -421,7 +421,7 @@ export default {
       const { startDate, endDate } = this.calcMonthRange()
       try {
         const res = await recordApi.getWeeklyStatistics({ startDate, endDate, type: this.recordType })
-        if (res.code === 200 && res.data) {
+        if (res.code === HTTP_CODE_OK && res.data) {
           this.monthSummary = { totalAmount: res.data.totalAmount || 0, averageAmount: res.data.averageAmount || 0 }
           this.monthPoints = this.buildMonthPoints(startDate, endDate, res.data.dailyList || [])
           this.$nextTick(() => { setTimeout(() => this.drawMonthChart(), 100) })
@@ -453,7 +453,7 @@ export default {
       const { year } = this.getYearRange()
       try {
         const res = await recordApi.getYearStatistics({ year, type: this.recordType })
-        if (res.code === 200 && res.data) {
+        if (res.code === HTTP_CODE_OK && res.data) {
           this.yearSummary = { totalAmount: res.data.totalAmount || 0, averageAmount: res.data.averageAmount || 0 }
           this.yearPoints = this.buildYearPoints(res.data.monthlyList || [], year)
           this.$nextTick(() => { setTimeout(() => this.drawYearChart(), 100) })

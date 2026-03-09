@@ -43,6 +43,7 @@
 
 <script>
 import { categoryApi, recordApi } from '@/utils/api.js'
+import { HTTP_CODE_OK } from '@/utils/util.js'
 import CategoryGrid from '@/components/category-grid/category-grid.vue'
 import Calculator from '@/components/calculator/calculator.vue'
 
@@ -123,7 +124,7 @@ export default {
           remark: data.remark
         })
         
-        if (res.code === 200) {
+        if (res.code === HTTP_CODE_OK) {
           uni.showToast({
             title: '保存成功',
             icon: 'success'

@@ -3,7 +3,6 @@ import store from './store/index.js'
 
 export default {
   onLaunch: function() {
-    console.log('App Launch')
     // 从 storage 恢复登录状态，保证冷启动后各页面能正确判断是否已登录
     const token = uni.getStorageSync('token')
     const userInfo = uni.getStorageSync('userInfo')
@@ -18,12 +17,6 @@ export default {
         }
       }
     }
-  },
-  onShow: function() {
-    console.log('App Show')
-  },
-  onHide: function() {
-    console.log('App Hide')
   }
 }
 </script>

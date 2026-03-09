@@ -2,6 +2,9 @@
 export const TYPE_EXPENSE = 1
 export const TYPE_INCOME = 2
 
+// 业务状态码：统一使用常量而不是魔法数字
+export const HTTP_CODE_OK = 200
+
 // 格式化日期
 export function formatDate(date, format = 'YYYY-MM-DD') {
   if (!date) return ''
