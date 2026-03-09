@@ -24,8 +24,8 @@ DROP TABLE IF EXISTS `category`;
 CREATE TABLE `category` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '分类ID',
   `name` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '分类名称',
-  `type` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '分类类型: expense-支出, income-收入',
-  `icon` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '分类图标（图标名称或URL）',
+  `type` tinyint(1) NOT NULL COMMENT '分类类型: 1-支出, 2-收入',
+  `icon` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '分类图标（存 emoji 或图标标识，展示时按此字段显示）',
   `sort_order` int(11) DEFAULT '0' COMMENT '排序顺序',
   `status` tinyint(1) DEFAULT '1' COMMENT '状态: 1-启用, 0-禁用',
   `del_flag` tinyint(1) NOT NULL DEFAULT '0' COMMENT '逻辑删除标识: 0-未删除, 1-已删除',
@@ -41,32 +41,32 @@ CREATE TABLE `category` (
 -- Records of category
 -- ----------------------------
 BEGIN;
-INSERT INTO `category` VALUES (1, '餐饮', 'expense', 'food', 1, 1, 0, '2026-03-08 15:04:17', '2026-03-08 15:04:17');
-INSERT INTO `category` VALUES (2, '交通', 'expense', 'transport', 2, 1, 0, '2026-03-08 15:04:17', '2026-03-08 15:04:17');
-INSERT INTO `category` VALUES (3, '购物', 'expense', 'shopping', 3, 1, 0, '2026-03-08 15:04:17', '2026-03-08 15:04:17');
-INSERT INTO `category` VALUES (4, '娱乐', 'expense', 'entertainment', 4, 1, 0, '2026-03-08 15:04:17', '2026-03-08 15:04:17');
-INSERT INTO `category` VALUES (5, '医疗', 'expense', 'medical', 5, 1, 0, '2026-03-08 15:04:17', '2026-03-08 15:04:17');
-INSERT INTO `category` VALUES (6, '教育', 'expense', 'education', 6, 1, 0, '2026-03-08 15:04:17', '2026-03-08 15:04:17');
-INSERT INTO `category` VALUES (7, '住房', 'expense', 'housing', 7, 1, 0, '2026-03-08 15:04:17', '2026-03-08 15:04:17');
-INSERT INTO `category` VALUES (8, '通讯', 'expense', 'communication', 8, 1, 0, '2026-03-08 15:04:17', '2026-03-08 15:04:17');
-INSERT INTO `category` VALUES (9, '服饰', 'expense', 'clothing', 9, 1, 0, '2026-03-08 15:04:17', '2026-03-08 15:04:17');
-INSERT INTO `category` VALUES (10, '美容', 'expense', 'beauty', 10, 1, 0, '2026-03-08 15:04:17', '2026-03-08 15:04:17');
-INSERT INTO `category` VALUES (11, '运动', 'expense', 'sports', 11, 1, 0, '2026-03-08 15:04:17', '2026-03-08 15:04:17');
-INSERT INTO `category` VALUES (12, '旅行', 'expense', 'travel', 12, 1, 0, '2026-03-08 15:04:17', '2026-03-08 15:04:17');
-INSERT INTO `category` VALUES (13, '宠物', 'expense', 'pet', 13, 1, 0, '2026-03-08 15:04:17', '2026-03-08 15:04:17');
-INSERT INTO `category` VALUES (14, '人情', 'expense', 'gift', 14, 1, 0, '2026-03-08 15:04:17', '2026-03-08 15:04:17');
-INSERT INTO `category` VALUES (15, '保险', 'expense', 'insurance', 15, 1, 0, '2026-03-08 15:04:17', '2026-03-08 15:04:17');
-INSERT INTO `category` VALUES (16, '缴费', 'expense', 'bill', 16, 1, 0, '2026-03-08 15:04:17', '2026-03-08 15:04:17');
-INSERT INTO `category` VALUES (17, '维修', 'expense', 'repair', 17, 1, 0, '2026-03-08 15:04:17', '2026-03-08 15:04:17');
-INSERT INTO `category` VALUES (18, '投资', 'expense', 'investment', 18, 1, 0, '2026-03-08 15:04:17', '2026-03-08 15:04:17');
-INSERT INTO `category` VALUES (19, '其他', 'expense', 'other', 19, 1, 0, '2026-03-08 15:04:17', '2026-03-08 15:04:17');
-INSERT INTO `category` VALUES (20, '工资', 'income', 'salary', 1, 1, 0, '2026-03-08 15:04:17', '2026-03-08 15:04:17');
-INSERT INTO `category` VALUES (21, '奖金', 'income', 'bonus', 2, 1, 0, '2026-03-08 15:04:17', '2026-03-08 15:04:17');
-INSERT INTO `category` VALUES (22, '投资收益', 'income', 'investment', 3, 1, 0, '2026-03-08 15:04:17', '2026-03-08 15:04:17');
-INSERT INTO `category` VALUES (23, '兼职', 'income', 'parttime', 4, 1, 0, '2026-03-08 15:04:17', '2026-03-08 15:04:17');
-INSERT INTO `category` VALUES (24, '红包', 'income', 'redpacket', 5, 1, 0, '2026-03-08 15:04:17', '2026-03-08 15:04:17');
-INSERT INTO `category` VALUES (25, '礼金', 'income', 'gift', 6, 1, 0, '2026-03-08 15:04:17', '2026-03-08 15:04:17');
-INSERT INTO `category` VALUES (26, '其他', 'income', 'other', 7, 1, 0, '2026-03-08 15:04:17', '2026-03-08 15:04:17');
+INSERT INTO `category` VALUES (1, '餐饮', 1, '🍔', 1, 1, 0, '2026-03-08 15:04:17', '2026-03-08 15:04:17');
+INSERT INTO `category` VALUES (2, '交通', 1, '🚗', 2, 1, 0, '2026-03-08 15:04:17', '2026-03-08 15:04:17');
+INSERT INTO `category` VALUES (3, '购物', 1, '🛍️', 3, 1, 0, '2026-03-08 15:04:17', '2026-03-08 15:04:17');
+INSERT INTO `category` VALUES (4, '娱乐', 1, '🎬', 4, 1, 0, '2026-03-08 15:04:17', '2026-03-08 15:04:17');
+INSERT INTO `category` VALUES (5, '医疗', 1, '🏥', 5, 1, 0, '2026-03-08 15:04:17', '2026-03-08 15:04:17');
+INSERT INTO `category` VALUES (6, '教育', 1, '📚', 6, 1, 0, '2026-03-08 15:04:17', '2026-03-08 15:04:17');
+INSERT INTO `category` VALUES (7, '住房', 1, '🏠', 7, 1, 0, '2026-03-08 15:04:17', '2026-03-08 15:04:17');
+INSERT INTO `category` VALUES (8, '通讯', 1, '📱', 8, 1, 0, '2026-03-08 15:04:17', '2026-03-08 15:04:17');
+INSERT INTO `category` VALUES (9, '服饰', 1, '👔', 9, 1, 0, '2026-03-08 15:04:17', '2026-03-08 15:04:17');
+INSERT INTO `category` VALUES (10, '美容', 1, '💄', 10, 1, 0, '2026-03-08 15:04:17', '2026-03-08 15:04:17');
+INSERT INTO `category` VALUES (11, '运动', 1, '⚽', 11, 1, 0, '2026-03-08 15:04:17', '2026-03-08 15:04:17');
+INSERT INTO `category` VALUES (12, '旅行', 1, '✈️', 12, 1, 0, '2026-03-08 15:04:17', '2026-03-08 15:04:17');
+INSERT INTO `category` VALUES (13, '宠物', 1, '🐶', 13, 1, 0, '2026-03-08 15:04:17', '2026-03-08 15:04:17');
+INSERT INTO `category` VALUES (14, '人情', 1, '🎁', 14, 1, 0, '2026-03-08 15:04:17', '2026-03-08 15:04:17');
+INSERT INTO `category` VALUES (15, '保险', 1, '🛡️', 15, 1, 0, '2026-03-08 15:04:17', '2026-03-08 15:04:17');
+INSERT INTO `category` VALUES (16, '缴费', 1, '💳', 16, 1, 0, '2026-03-08 15:04:17', '2026-03-08 15:04:17');
+INSERT INTO `category` VALUES (17, '维修', 1, '🔧', 17, 1, 0, '2026-03-08 15:04:17', '2026-03-08 15:04:17');
+INSERT INTO `category` VALUES (18, '投资', 1, '📈', 18, 1, 0, '2026-03-08 15:04:17', '2026-03-08 15:04:17');
+INSERT INTO `category` VALUES (19, '其他', 1, '📦', 19, 1, 0, '2026-03-08 15:04:17', '2026-03-08 15:04:17');
+INSERT INTO `category` VALUES (20, '工资', 2, '💰', 1, 1, 0, '2026-03-08 15:04:17', '2026-03-08 15:04:17');
+INSERT INTO `category` VALUES (21, '奖金', 2, '🎉', 2, 1, 0, '2026-03-08 15:04:17', '2026-03-08 15:04:17');
+INSERT INTO `category` VALUES (22, '投资收益', 2, '📈', 3, 1, 0, '2026-03-08 15:04:17', '2026-03-08 15:04:17');
+INSERT INTO `category` VALUES (23, '兼职', 2, '💼', 4, 1, 0, '2026-03-08 15:04:17', '2026-03-08 15:04:17');
+INSERT INTO `category` VALUES (24, '红包', 2, '🧧', 5, 1, 0, '2026-03-08 15:04:17', '2026-03-08 15:04:17');
+INSERT INTO `category` VALUES (25, '礼金', 2, '🎁', 6, 1, 0, '2026-03-08 15:04:17', '2026-03-08 15:04:17');
+INSERT INTO `category` VALUES (26, '其他', 2, '📦', 7, 1, 0, '2026-03-08 15:04:17', '2026-03-08 15:04:17');
 COMMIT;
 
 -- ----------------------------
@@ -77,7 +77,7 @@ CREATE TABLE `record` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '记录ID',
   `user_id` bigint(20) NOT NULL COMMENT '用户ID',
   `category_id` bigint(20) NOT NULL COMMENT '分类ID',
-  `type` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '类型: expense-支出, income-收入',
+  `type` tinyint(1) NOT NULL COMMENT '类型: 1-支出, 2-收入',
   `amount` decimal(10,2) NOT NULL COMMENT '金额',
   `remark` varchar(500) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '备注',
   `record_date` date NOT NULL COMMENT '记账日期',
@@ -99,18 +99,18 @@ CREATE TABLE `record` (
 -- Records of record
 -- ----------------------------
 BEGIN;
-INSERT INTO `record` VALUES (1, 3, 1, 'expense', 19.00, '', '2026-02-08', 0, '2026-03-08 16:26:02', '2026-03-08 20:20:39');
-INSERT INTO `record` VALUES (2, 3, 2, 'expense', 12.00, '', '2026-02-08', 0, '2026-03-08 16:26:31', '2026-03-08 20:20:43');
-INSERT INTO `record` VALUES (3, 3, 9, 'expense', 85.00, '鞋子', '2026-03-08', 0, '2026-03-08 16:27:14', '2026-03-08 16:27:14');
-INSERT INTO `record` VALUES (4, 3, 20, 'income', 1222.00, '', '2026-03-08', 0, '2026-03-08 16:46:08', '2026-03-08 16:46:08');
-INSERT INTO `record` VALUES (5, 3, 10, 'expense', 2.00, '', '2026-03-08', 0, '2026-03-08 17:01:10', '2026-03-08 17:01:10');
-INSERT INTO `record` VALUES (6, 3, 7, 'income', 22.00, '', '2026-02-08', 0, '2026-03-08 17:04:12', '2026-03-08 20:20:57');
-INSERT INTO `record` VALUES (7, 3, 7, 'expense', 22.00, '', '2026-03-08', 0, '2026-03-08 17:13:43', '2026-03-08 17:13:43');
-INSERT INTO `record` VALUES (8, 3, 2, 'expense', 22.00, '', '2026-03-08', 0, '2026-03-08 17:15:03', '2026-03-08 17:15:03');
-INSERT INTO `record` VALUES (9, 3, 18, 'expense', 6.00, '', '2026-03-08', 0, '2026-03-08 17:16:34', '2026-03-08 17:16:34');
-INSERT INTO `record` VALUES (10, 3, 14, 'expense', 6.00, '', '2026-03-08', 0, '2026-03-08 17:16:40', '2026-03-08 17:16:40');
-INSERT INTO `record` VALUES (11, 3, 18, 'expense', 333.00, '', '2026-03-08', 0, '2026-03-08 18:07:14', '2026-03-08 18:07:14');
-INSERT INTO `record` VALUES (12, 3, 1, 'expense', 35.00, '', '2026-03-08', 0, '2026-03-08 20:20:00', '2026-03-08 20:20:00');
+INSERT INTO `record` VALUES (1, 3, 1, 1, 19.00, '', '2026-02-08', 0, '2026-03-08 16:26:02', '2026-03-08 20:20:39');
+INSERT INTO `record` VALUES (2, 3, 2, 1, 12.00, '', '2026-02-08', 0, '2026-03-08 16:26:31', '2026-03-08 20:20:43');
+INSERT INTO `record` VALUES (3, 3, 9, 1, 85.00, '鞋子', '2026-03-08', 0, '2026-03-08 16:27:14', '2026-03-08 16:27:14');
+INSERT INTO `record` VALUES (4, 3, 20, 2, 1222.00, '', '2026-03-08', 0, '2026-03-08 16:46:08', '2026-03-08 16:46:08');
+INSERT INTO `record` VALUES (5, 3, 10, 1, 2.00, '', '2026-03-08', 0, '2026-03-08 17:01:10', '2026-03-08 17:01:10');
+INSERT INTO `record` VALUES (6, 3, 7, 2, 22.00, '', '2026-02-08', 0, '2026-03-08 17:04:12', '2026-03-08 20:20:57');
+INSERT INTO `record` VALUES (7, 3, 7, 1, 22.00, '', '2026-03-08', 0, '2026-03-08 17:13:43', '2026-03-08 17:13:43');
+INSERT INTO `record` VALUES (8, 3, 2, 1, 22.00, '', '2026-03-08', 0, '2026-03-08 17:15:03', '2026-03-08 17:15:03');
+INSERT INTO `record` VALUES (9, 3, 18, 1, 6.00, '', '2026-03-08', 0, '2026-03-08 17:16:34', '2026-03-08 17:16:34');
+INSERT INTO `record` VALUES (10, 3, 14, 1, 6.00, '', '2026-03-08', 0, '2026-03-08 17:16:40', '2026-03-08 17:16:40');
+INSERT INTO `record` VALUES (11, 3, 18, 1, 333.00, '', '2026-03-08', 0, '2026-03-08 18:07:14', '2026-03-08 18:07:14');
+INSERT INTO `record` VALUES (12, 3, 1, 1, 35.00, '', '2026-03-08', 0, '2026-03-08 20:20:00', '2026-03-08 20:20:00');
 COMMIT;
 
 -- ----------------------------

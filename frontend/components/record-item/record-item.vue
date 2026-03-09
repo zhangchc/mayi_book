@@ -1,20 +1,20 @@
 <template>
   <view class="record-item">
     <view class="category-icon-wrapper">
-      <text class="category-icon">{{ getCategoryIcon(record.categoryName) }}</text>
+      <text class="category-icon">{{ getCategoryIconDisplay(record.categoryIcon, record.categoryName) }}</text>
     </view>
     <view class="category-info">
       <text class="category-name">{{ record.categoryName }}</text>
       <text v-if="record.remark" class="remark">{{ record.remark }}</text>
     </view>
     <view class="amount">
-      <text :class="amountClass">{{ type === 'expense' ? '-' : '+' }}¥{{ formatAmount(record.amount) }}</text>
+      <text :class="amountClass">{{ type === 1 ? '-' : '+' }}¥{{ formatAmount(record.amount) }}</text>
     </view>
   </view>
 </template>
 
 <script>
-import { formatAmount } from '@/utils/util.js'
+import { formatAmount, getCategoryIconDisplay } from '@/utils/util.js'
 
 export default {
   name: 'RecordItem',
@@ -24,55 +24,18 @@ export default {
       required: true
     },
     type: {
-      type: String,
-      default: 'expense' // expense: 支出, income: 收入
+      type: Number,
+      default: 1 // 1-支出 2-收入
     }
   },
-  
   computed: {
     amountClass() {
-      return this.type === 'expense' ? 'expense' : 'income'
+      return this.type === 1 ? 'expense' : 'income'
     }
   },
-  
   methods: {
     formatAmount,
-    getCategoryIcon(categoryName) {
-      // 根据分类名称映射图标
-      const iconMap = {
-        // 支出分类
-        '餐饮': '🍔',
-        '交通': '🚗',
-        '购物': '🛍️',
-        '娱乐': '🎬',
-        '医疗': '🏥',
-        '教育': '📚',
-        '住房': '🏠',
-        '通讯': '📱',
-        '服饰': '👔',
-        '美容': '💄',
-        '运动': '⚽',
-        '旅行': '✈️',
-        '宠物': '🐶',
-        '人情': '🎁',
-        '保险': '🛡️',
-        '缴费': '💳',
-        '电费': '🎮',
-        '日用': '🧻',
-        '孩子': '😊',
-        '维修': '🔧',
-        '投资': '📈',
-        '其他': '📦',
-        // 收入分类
-        '工资': '💰',
-        '奖金': '🎉',
-        '投资收益': '📈',
-        '兼职': '💼',
-        '红包': '🧧',
-        '礼金': '🎁'
-      }
-      return iconMap[categoryName] || '📝'
-    }
+    getCategoryIconDisplay
   }
 }
 </script>

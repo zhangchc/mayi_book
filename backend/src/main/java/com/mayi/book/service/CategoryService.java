@@ -16,7 +16,7 @@ public class CategoryService {
 
     public List<Category> getExpenseCategories() {
         LambdaQueryWrapper<Category> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(Category::getType, "expense")
+        queryWrapper.eq(Category::getType, 1)
                     .eq(Category::getStatus, 1)
                     .orderByAsc(Category::getSortOrder);
         return categoryMapper.selectList(queryWrapper);
@@ -24,7 +24,7 @@ public class CategoryService {
 
     public List<Category> getIncomeCategories() {
         LambdaQueryWrapper<Category> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(Category::getType, "income")
+        queryWrapper.eq(Category::getType, 2)
                     .eq(Category::getStatus, 1)
                     .orderByAsc(Category::getSortOrder);
         return categoryMapper.selectList(queryWrapper);

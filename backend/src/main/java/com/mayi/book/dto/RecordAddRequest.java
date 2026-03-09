@@ -8,5 +8,5 @@ public class RecordAddRequest {
     private Long categoryId;
     private BigDecimal amount;
     private String remark;
-    private String type;  // expense-支出, income-收入
+    private Integer type;  // 1-支出, 2-收入
 }

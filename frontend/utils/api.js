@@ -66,5 +66,32 @@ export const recordApi = {
       method: 'GET',
       data: { month }
     })
+  },
+  
+  // 按周统计（startDate/endDate：yyyy-MM-dd，type：1-支出 2-收入）
+  getWeeklyStatistics(params) {
+    return request({
+      url: '/record/weekly-statistics',
+      method: 'GET',
+      data: params
+    })
+  },
+
+  // 支出排行榜（startDate/endDate：yyyy-MM-dd）
+  getExpenseRanking(params) {
+    return request({
+      url: '/record/expense-ranking',
+      method: 'GET',
+      data: params
+    })
+  },
+
+  // 按年统计（月维度折线），参数 year、type（1-支出 2-收入）
+  getYearStatistics(params) {
+    return request({
+      url: '/record/year-statistics',
+      method: 'GET',
+      data: params
+    })
   }
 }

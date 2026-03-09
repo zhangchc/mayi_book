@@ -16,7 +16,7 @@ public class Category {
     
     private String name;
     
-    private String type;  // expense-支出, income-收入
+    private Integer type;  // 1-支出, 2-收入
     
     private String icon;
     

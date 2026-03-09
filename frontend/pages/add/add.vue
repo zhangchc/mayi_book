@@ -5,15 +5,15 @@
       <view class="header-tabs">
         <view 
           class="tab-item" 
-          :class="{ active: recordType === 'expense' }"
-          @click="switchTab('expense')"
+          :class="{ active: recordType === 1 }"
+          @click="switchTab(1)"
         >
           <text>支出</text>
         </view>
         <view 
           class="tab-item" 
-          :class="{ active: recordType === 'income' }"
-          @click="switchTab('income')"
+          :class="{ active: recordType === 2 }"
+          @click="switchTab(2)"
         >
           <text>收入</text>
         </view>
@@ -54,7 +54,7 @@ export default {
   
   data() {
     return {
-      recordType: 'expense', // expense: 支出, income: 收入
+      recordType: 1, // 1-支出 2-收入
       categories: [],
       selectedCategory: null,
       showCalculator: false
@@ -62,8 +62,9 @@ export default {
   },
   
   onLoad(options) {
-    if (options.type) {
-      this.recordType = options.type
+    if (options.type !== undefined && options.type !== '') {
+      const t = parseInt(options.type, 10)
+      if (t === 1 || t === 2) this.recordType = t
     }
     this.loadCategories()
   },
@@ -92,7 +93,7 @@ export default {
     
     async loadCategories() {
       try {
-        const res = this.recordType === 'expense' 
+        const res = this.recordType === 1
           ? await categoryApi.getExpenseCategories()
           : await categoryApi.getIncomeCategories()
         
@@ -117,9 +118,9 @@ export default {
       try {
         const res = await recordApi.addRecord({
           categoryId: this.selectedCategory.id,
+          type: this.recordType,
           amount: data.amount,
-          remark: data.remark,
-          type: this.recordType
+          remark: data.remark
         })
         
         if (res.code === 200) {

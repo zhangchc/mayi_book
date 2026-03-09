@@ -57,8 +57,8 @@ export default {
       default: null
     },
     recordType: {
-      type: String,
-      default: 'expense'
+      type: Number,
+      default: 1  // 1-支出 2-收入
     }
   },
   

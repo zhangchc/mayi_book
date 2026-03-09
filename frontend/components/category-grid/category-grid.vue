@@ -7,7 +7,7 @@
       @click="handleSelect(category)"
     >
       <view class="category-icon">
-        <text>{{ getIcon(category.icon) }}</text>
+        <text>{{ getCategoryIconDisplay(category.icon, category.name) }}</text>
       </view>
       <text class="category-name">{{ category.name }}</text>
     </view>
@@ -15,6 +15,8 @@
 </template>
 
 <script>
+import { getCategoryIconDisplay } from '@/utils/util.js'
+
 export default {
   name: 'CategoryGrid',
   props: {
@@ -23,44 +25,14 @@ export default {
       default: () => []
     },
     recordType: {
-      type: String,
-      default: 'expense'
+      type: Number,
+      default: 1  // 1-支出 2-收入
     }
   },
-  
   methods: {
+    getCategoryIconDisplay,
     handleSelect(category) {
       this.$emit('select', category)
-    },
-    
-    getIcon(iconName) {
-      // 简单的图标映射，实际可以使用图标字体或图片
-      const iconMap = {
-        'food': '🍔',
-        'transport': '🚗',
-        'shopping': '🛍️',
-        'entertainment': '🎬',
-        'medical': '🏥',
-        'education': '📚',
-        'housing': '🏠',
-        'communication': '📱',
-        'clothing': '👔',
-        'beauty': '💄',
-        'sports': '⚽',
-        'travel': '✈️',
-        'pet': '🐶',
-        'gift': '🎁',
-        'insurance': '🛡️',
-        'bill': '💳',
-        'repair': '🔧',
-        'investment': '📈',
-        'other': '📦',
-        'salary': '💰',
-        'bonus': '🎉',
-        'parttime': '💼',
-        'redpacket': '🧧'
-      }
-      return iconMap[iconName] || '📝'
     }
   }
 }

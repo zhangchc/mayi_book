@@ -28,8 +28,8 @@
                 WHEN 6 THEN '星期五'
                 WHEN 7 THEN '星期六'
             END as dayOfWeek,
-            COALESCE(SUM(CASE WHEN t.type = 'expense' THEN t.amount ELSE 0 END), 0) as totalExpense,
-            COALESCE(SUM(CASE WHEN t.type = 'income' THEN t.amount ELSE 0 END), 0) as totalIncome
+            COALESCE(SUM(CASE WHEN t.type = 1 THEN t.amount ELSE 0 END), 0) as totalExpense,
+            COALESCE(SUM(CASE WHEN t.type = 2 THEN t.amount ELSE 0 END), 0) as totalIncome
         FROM (
             SELECT
                 DATE(r.record_date) as date,
@@ -42,7 +42,7 @@
             <if test="month != null and month != ''">
               AND DATE_FORMAT(r.record_date, '%Y-%m') = #{month}
             </if>
-            <if test="type != null and type != ''">
+            <if test="type != null">
               AND r.type = #{type}
             </if>
         ) t
@@ -59,7 +59,7 @@
         <if test="month != null and month != ''">
           AND DATE_FORMAT(r.record_date, '%Y-%m') = #{month}
         </if>
-        <if test="type != null and type != ''">
+        <if test="type != null">
           AND r.type = #{type}
         </if>
     </select>
@@ -68,7 +68,9 @@
         SELECT
             r.id,
             r.type,
+            r.category_id as categoryId,
             c.name as categoryName,
+            c.icon as categoryIcon,
             r.amount,
             r.remark,
             r.create_time as createTime
@@ -77,7 +79,7 @@
         WHERE r.user_id = #{userId}
           AND DATE(r.record_date) = #{date}
           AND r.del_flag = 0
-        <if test="type != null and type != ''">
+        <if test="type != null">
           AND r.type = #{type}
         </if>
         ORDER BY r.create_time DESC
@@ -85,16 +87,67 @@
 
     <select id="selectStatistics" resultType="com.mayi.book.dto.StatisticsResponse">
         SELECT
-            COALESCE(SUM(CASE WHEN type = 'expense' THEN amount ELSE 0 END), 0) as totalExpense,
-            COALESCE(SUM(CASE WHEN type = 'income' THEN amount ELSE 0 END), 0) as totalIncome,
-            COALESCE(SUM(CASE WHEN type = 'income' THEN amount ELSE 0 END), 0) -
-            COALESCE(SUM(CASE WHEN type = 'expense' THEN amount ELSE 0 END), 0) as balance
+            COALESCE(SUM(CASE WHEN type = 1 THEN amount ELSE 0 END), 0) as totalExpense,
+            COALESCE(SUM(CASE WHEN type = 2 THEN amount ELSE 0 END), 0) as totalIncome,
+            COALESCE(SUM(CASE WHEN type = 2 THEN amount ELSE 0 END), 0) -
+            COALESCE(SUM(CASE WHEN type = 1 THEN amount ELSE 0 END), 0) as balance
         FROM record
         WHERE user_id = #{userId}
           AND del_flag = 0
         <if test="month != null and month != ''">
           AND DATE_FORMAT(record_date, '%Y-%m') = #{month}
         </if>
+    </select>
+
+    <!-- 按天汇总指定日期范围内的金额数据 -->
+    <select id="selectDailyAmountRange" resultType="com.mayi.book.dto.DailyAmountDTO">
+        SELECT
+            DATE(record_date) AS date,
+            COALESCE(SUM(amount), 0) AS amount
+        FROM record
+        WHERE user_id = #{userId}
+          AND del_flag = 0
+          AND record_date &gt;= #{startDate}
+          AND record_date &lt;= #{endDate}
+        <if test="type != null">
+          AND type = #{type}
+        </if>
+        GROUP BY DATE(record_date)
+        ORDER BY DATE(record_date)
+    </select>
+
+    <!-- 支出排行榜：按分类汇总，金额从高到低 -->
+    <select id="selectExpenseRankByDateRange" resultType="com.mayi.book.dto.CategoryExpenseRankDTO">
+        SELECT
+            c.id AS categoryId,
+            c.name AS categoryName,
+            c.icon AS icon,
+            COALESCE(SUM(r.amount), 0) AS amount
+        FROM record r
+        INNER JOIN category c ON r.category_id = c.id AND c.del_flag = 0 AND c.type = 1
+        WHERE r.user_id = #{userId}
+          AND r.del_flag = 0
+          AND r.type = 1
+          AND r.record_date &gt;= #{startDate}
+          AND r.record_date &lt;= #{endDate}
+        GROUP BY c.id, c.name, c.icon
+        ORDER BY amount DESC
+    </select>
+
+    <!-- 按年按月汇总 -->
+    <select id="selectMonthlyAmountByYear" resultType="com.mayi.book.dto.MonthlyAmountDTO">
+        SELECT
+            DATE_FORMAT(record_date, '%Y-%m') AS month,
+            COALESCE(SUM(amount), 0) AS amount
+        FROM record
+        WHERE user_id = #{userId}
+          AND del_flag = 0
+          AND YEAR(record_date) = #{year}
+        <if test="type != null">
+          AND type = #{type}
+        </if>
+        GROUP BY DATE_FORMAT(record_date, '%Y-%m')
+        ORDER BY month
     </select>
 
 </mapper>

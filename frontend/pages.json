@@ -21,6 +21,12 @@
       }
     },
     {
+      "path": "pages/statistics/pie",
+      "style": {
+        "navigationBarTitleText": "分类占比"
+      }
+    },
+    {
       "path": "pages/discover/discover",
       "style": {
         "navigationBarTitleText": "发现"

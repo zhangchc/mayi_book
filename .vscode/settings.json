@@ -1,3 +1,7 @@
 {
-    "java.configuration.updateBuildConfiguration": "interactive"
+    "java.configuration.updateBuildConfiguration": "interactive",
+    "java.compile.nullAnalysis.mode": "automatic",
+    "workbench.activityBar.orientation": "vertical",
+    "workbench.sideBar.location": "left",
+    "workbench.secondarySideBar.showLabels": true
 }

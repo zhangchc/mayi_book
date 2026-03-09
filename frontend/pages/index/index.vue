@@ -416,8 +416,9 @@ export default {
     },
     
     getRecordType(record) {
-      // 从record对象中获取type字段
-      return record.type || 'expense'
+      // 从record对象中获取type字段，1-支出 2-收入
+      const t = record.type
+      return (t === 1 || t === 2) ? t : 1
     },
     
     handleFunctionClick(functionName) {
