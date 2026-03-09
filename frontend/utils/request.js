@@ -1,4 +1,5 @@
 import config from '../config/index.js'
+import store from '../store/index.js'
 
 const BASE_URL = config.baseUrl
 
@@ -39,13 +40,9 @@ const request = (options) => {
           if (res.data.code === 200) {
             resolve(res.data)
           } else if (res.data.code === 401) {
-            // token过期，清除本地存储，跳转到登录页
-            console.warn('Token过期，跳转到登录页')
-            uni.removeStorageSync('token')
-            uni.removeStorageSync('userInfo')
-            uni.reLaunch({
-              url: '/pages/login/login'
-            })
+            // token 过期或未登录，清除本地存储和 Vuex，不自动跳转（由各页面决定是否跳转登录）
+            console.warn('未登录或 Token 过期')
+            store.commit('CLEAR_USER_INFO')
             reject(new Error(res.data.message || '登录已过期，请重新登录'))
           } else {
             // 后端返回的错误

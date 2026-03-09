@@ -5,7 +5,7 @@
 
 // ========== 环境配置 ==========
 // 修改此处的值来切换环境: 'test' 或 'prod'
-const ENV = 'prod'
+const ENV = 'test'
 // ==============================
 
 import testConfig from './test.js'

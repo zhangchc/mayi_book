@@ -1,7 +1,7 @@
 <template>
   <view class="mine-container">
-    <!-- 用户信息 -->
-    <view class="user-info">
+    <!-- 已登录：用户信息 -->
+    <view v-if="isLoggedIn" class="user-info">
       <image 
         class="avatar" 
         :src="localUserInfo.avatarUrl || '/static/default-avatar.png'"
@@ -10,8 +10,21 @@
       <text class="nickname">{{ localUserInfo.nickName || '未设置昵称' }}</text>
     </view>
     
-    <!-- 退出登录 -->
-    <view class="logout-btn" @click="handleLogout">
+    <!-- 未登录：占位与微信连登 -->
+    <view v-else class="user-info guest">
+      <image 
+        class="avatar" 
+        src="/static/default-avatar.png"
+        mode="aspectFill"
+      />
+      <text class="nickname">未登录</text>
+      <view class="wechat-login-btn" @click="goWechatLogin">
+        <text>微信连登</text>
+      </view>
+    </view>
+    
+    <!-- 已登录时显示退出登录 -->
+    <view v-if="isLoggedIn" class="logout-btn" @click="handleLogout">
       <text>退出登录</text>
     </view>
   </view>
@@ -23,7 +36,11 @@ import { userApi } from '@/utils/api.js'
 
 export default {
   computed: {
-    ...mapState(['userInfo'])
+    ...mapState(['userInfo', 'token']),
+    // 必须依赖 Vuex 的 token，这样登录成功后切回「我的」tab 时界面会响应式更新
+    isLoggedIn() {
+      return !!this.token
+    }
   },
   
   data() {
@@ -33,42 +50,56 @@ export default {
   },
   
   onLoad() {
+    this.syncUserInfoFromStorage()
     this.loadUserInfo()
   },
   
   onShow() {
-    // 每次显示页面时，也尝试从后端获取最新信息
+    this.syncUserInfoFromStorage()
     this.loadUserInfo()
   },
   
   methods: {
     ...mapMutations(['CLEAR_USER_INFO', 'SET_USER_INFO']),
     
+    // 从 storage 恢复用户信息到 store（用于冷启动后「我的」页正确显示已登录状态）
+    syncUserInfoFromStorage() {
+      const token = uni.getStorageSync('token')
+      const userInfo = uni.getStorageSync('userInfo')
+      if (token && userInfo && !this.userInfo) {
+        try {
+          const info = typeof userInfo === 'string' ? JSON.parse(userInfo) : userInfo
+          this.SET_TOKEN(token)
+          this.SET_USER_INFO(info)
+        } catch (e) {
+          console.warn('syncUserInfoFromStorage parse error', e)
+        }
+      }
+    },
+    
+    goWechatLogin() {
+      uni.navigateTo({
+        url: '/pages/login/login'
+      })
+    },
+    
     async loadUserInfo() {
+      if (!this.isLoggedIn) return
       // 优先使用 Vuex 中的用户信息
       if (this.userInfo && this.userInfo.userId) {
-        this.localUserInfo = this.userInfo
-        console.log('使用 Vuex 中的用户信息:', this.localUserInfo)
+        this.localUserInfo = { ...this.userInfo }
       }
-      
       // 从后端获取最新信息（用于同步）
       try {
         const res = await userApi.getUserInfo()
         if (res.code === 200 && res.data) {
-          // 合并后端返回的信息（后端信息更准确）
-          this.localUserInfo = {
-            ...this.localUserInfo,
-            ...res.data
-          }
-          // 更新 Vuex 中的用户信息
+          this.localUserInfo = { ...this.localUserInfo, ...res.data }
           this.SET_USER_INFO(this.localUserInfo)
-          console.log('从后端获取用户信息:', this.localUserInfo)
         }
       } catch (error) {
         console.error('加载用户信息失败:', error)
-        // 如果后端获取失败，至少使用 Vuex 中的信息
         if (this.userInfo && this.userInfo.userId) {
-          this.localUserInfo = this.userInfo
+          this.localUserInfo = { ...this.userInfo }
         }
       }
     },
@@ -118,6 +149,25 @@ export default {
   font-size: 32rpx;
   color: #333;
   font-weight: bold;
+}
+
+.user-info.guest .nickname {
+  color: #999;
+  font-weight: normal;
+}
+
+.wechat-login-btn {
+  margin-top: 40rpx;
+  width: 400rpx;
+  height: 88rpx;
+  background: linear-gradient(135deg, #07c160 0%, #06ad56 100%);
+  border-radius: 44rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32rpx;
+  color: #fff;
+  font-weight: 500;
 }
 
 .logout-btn {

@@ -209,13 +209,30 @@ export default {
   },
   
   onLoad() {
-    // 初次加载时同时加载明细和统计数据
     this.startTimer()
+    // 未登录时直接展示 0 和空列表，不请求接口
+    const token = uni.getStorageSync('token')
+    if (!token) {
+      this.statistics = { totalExpense: 0, totalIncome: 0, balance: 0 }
+      this.recordList = []
+      this.loading = false
+      this.noMore = true
+      return
+    }
     this.loadInitialData()
   },
   
   onShow() {
-    // 如果不是首次加载，页面显示时刷新数据（包括从记账页面返回时）
+    const token = uni.getStorageSync('token')
+    // 登录后刚切回明细页（之前未登录未拉过数据）：按当前用户加载数据
+    if (token && this.recordList.length === 0 && !this.loading) {
+      this.page = 1
+      this.noMore = false
+      this.refreshData()
+      this.isFirstLoad = false
+      return
+    }
+    // 非首次进入时，页面显示时刷新数据（包括从记账页返回、从其他 tab 切回）
     if (!this.isFirstLoad) {
       this.refreshData()
     }
@@ -298,10 +315,17 @@ export default {
         }
       } catch (error) {
         console.error('加载数据失败:', error)
-        uni.showToast({
-          title: '加载失败，请重试',
-          icon: 'none'
-        })
+        // 未登录/401 时只展示空列表，不提示错误
+        const isAuthError = !error || (error.message && (error.message.includes('登录') || error.message.includes('401')))
+        if (isAuthError) {
+          if (this.page === 1) this.recordList = []
+          this.noMore = true
+        } else {
+          uni.showToast({
+            title: '加载失败，请重试',
+            icon: 'none'
+          })
+        }
       } finally {
         this.loading = false
         this.refreshing = false
@@ -317,6 +341,11 @@ export default {
         }
       } catch (error) {
         console.error('加载统计失败:', error)
+        // 未登录/401 时展示 0
+        const isAuthError = !error || (error.message && (error.message.includes('登录') || error.message.includes('401')))
+        if (isAuthError) {
+          this.statistics = { totalExpense: 0, totalIncome: 0, balance: 0 }
+        }
       }
     },
     
